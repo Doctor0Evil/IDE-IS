@@ -1,0 +1,46 @@
+aln MODULE ALN_CROSS_PLATFORM_BRIDGE_V3
+  description "Bridge profile allowing ALN to be called safely from any host language or engine without importing foreign libraries."
+  runtime     ALN_QSAFE_2027
+
+  bridge_capabilities {
+    supports_c_call_boundary      true
+    supports_rest_like_boundary   true
+    supports_message_queue_bridge true
+    supports_engine_plugin_mode   true
+  }
+
+  host_languages [
+    C,
+    Cpp,
+    Rust,
+    CSharp,
+    Java,
+    Python,
+    Go
+  ]
+
+  boundary_contract {
+    request_fields [
+      request_id,
+      caller_id,
+      verb,
+      payload,
+      timestamp
+    ]
+    response_fields [
+      request_id,
+      status,
+      payload,
+      compliance_score
+    ]
+  }
+
+  function ALN_BridgeHandle(request)
+    step 1  ensure_no_foreign_library_reference request
+    step 2  ensure_no_code_injection            request
+    step 3  map_verb_to_aln_module              request.verb
+    step 4  execute_in_sandbox                  mapped_module
+    step 5  compute_compliance_score            request, result
+    step 6  return_response                     result
+  END
+ALNEND
