@@ -1,0 +1,32 @@
+// aln 1.0.0
+module IDEChat.Routing
+
+import IDEChat.Safety
+
+fn route(prompt: String, cfg: ProjectConfig) -> List<ToolInvocation> {
+  let trimmed = str.lower(str.trim(prompt))
+
+  if str.startsWith(trimmed, "init repo") {
+    return [
+      ToolInvocation{ tool = "shell.run", args = ["git", "init"] },
+      ToolInvocation{ tool = "shell.run", args = ["git", "checkout", "-b", cfg.defaultBranch] }
+    ]
+  }
+
+  if str.startsWith(trimmed, "create feature branch") {
+    let branch = "feature/auto-" + str.hash(prompt)
+    return [
+      ToolInvocation{ tool = "shell.run", args = ["git", "checkout", "-b", branch] }
+    ]
+  }
+
+  if str.startsWith(trimmed, "open pull request") {
+    return [
+      ToolInvocation{ tool = "github.createPR", args = ["auto: " + prompt] }
+    ]
+  }
+
+  return [
+    ToolInvocation{ tool = "shell.run", args = ["echo", "No mapped action for prompt."] }
+  ]
+}

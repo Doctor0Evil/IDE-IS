@@ -1,0 +1,49 @@
+name: "IDE-Chat CI"
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Prepare ci-tools
+        run: |
+          mkdir -p ci-tools
+          cd ci-tools
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+          npm install --no-audit --no-fund ajv-cli --save-dev
+
+      - name: ALN primitives sanity
+        run: |
+          node tests/aln_functions_sanity.mjs
+
+      - name: Validate JSON config
+        run: |
+          npm --prefix ci-tools run validate-config
+
+      - name: Run ALN structure & routing checks
+        run: |
+          npm test
+
+      - name: Intent bundle unit test
+        run: |
+          npm run test-intent-bundle
+
+      - name: Run routing consistency directly (extra check)
+        run: |
+          node tests/idechat-routing-consistency.mjs

@@ -1,0 +1,37 @@
+// Export / provenance scenario to check EXPORT_CHECK and IP_TAG_ENFORCE
+
+scenario "export_large_artifact_set_requires_provenance" {
+  let user = User { id: "exporter-1" }
+  let project = Project { id: "proj-exports-1", license: "ALN_SAFE_ROOM" }
+
+  // Create artifact with provenance
+  let artifact = Artifact { id: "large-art-0001", provenance: { origin_id_tag: "SAFE_ROOM.AI_IDE_ORCH.2025-12-22" } }
+
+  request EXPORT_PROJECT {
+    user: user
+    project: project
+    artifacts: [artifact]
+    target: "external-archive"
+  }
+
+  expect ALLOW
+  assert audit.entry_exists("EXPORT_CHECK_PASSED", project.id)
+}
+
+scenario "export_without_provenance_is_denied" {
+  let user = User { id: "exporter-2" }
+  let project = Project { id: "proj-exports-2", license: "ALN_SAFE_ROOM" }
+
+  // Artifact missing provenance should be denied during export
+  let artifact = Artifact { id: "large-art-0002" }
+
+  request EXPORT_PROJECT {
+    user: user
+    project: project
+    artifacts: [artifact]
+    target: "external-archive"
+  }
+
+  expect DENY
+  assert audit.entry_exists("EXPORT_CHECK_FAILED", project.id)
+}

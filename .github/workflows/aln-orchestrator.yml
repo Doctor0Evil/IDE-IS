@@ -1,0 +1,53 @@
+name: "ALN Orchestrator Validation"
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'aln/**'
+      - '.github/workflows/aln-orchestrator.yml'
+  pull_request:
+    paths:
+      - 'aln/**'
+      - '.github/workflows/aln-orchestrator.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install deps (if requirements.txt exists)
+        if: ${{ hashFiles('**/requirements.txt') != '' }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run ALN tests and structural checks
+        run: |
+          chmod +x aln/tests/run_aln_tests.sh
+          aln/tests/run_aln_tests.sh
+
+      - name: Fallback: show a short summary of relevant files
+        if: failure()
+        run: |
+          echo "=== Orchestrator_Core.aln ==="
+          sed -n '1,160p' aln/code/ai_chat_ide/Orchestrator_Core.aln || true
+          echo "=== Spec snippet (Device classes) ==="
+          grep -n "Device-Class Model" -n aln/policies/ai_chat_ide/AIChat_IDE_Orchestrator_Spec_v1.txt || true
+

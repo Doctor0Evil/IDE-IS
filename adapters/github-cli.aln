@@ -1,0 +1,34 @@
+// aln 1.0.0
+module IDEChat.Adapters.GitHubCLI
+
+fn clone(args: List<String>) -> String {
+  // Expect args = [repoUrl]
+  if len(args) != 1 {
+    return "github.clone: expected repo URL"
+  }
+
+  let cmd = ["gh", "repo", "clone", args[0]]
+  let code, out, err = sys.exec(cmd)
+
+  if code != 0 {
+    return "github.clone failed: " + err
+  }
+
+  return out
+}
+
+fn createPR(args: List<String>) -> String {
+  // Expect args = [title]
+  if len(args) != 1 {
+    return "github.createPR: expected title"
+  }
+
+  let cmd = ["gh", "pr", "create", "--fill", "--title", args[0]]
+  let code, out, err = sys.exec(cmd)
+
+  if code != 0 {
+    return "github.createPR failed: " + err
+  }
+
+  return out
+}

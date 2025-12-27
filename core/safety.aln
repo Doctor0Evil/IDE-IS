@@ -1,0 +1,22 @@
+// aln 1.0.0
+module IDEChat.Safety
+
+type SafetyDecision {
+  allowed: Bool
+  reason: String
+}
+
+fn isToolAllowed(tool: String, args: List<String>) -> Bool {
+  // Never allow direct kernel, BCI, or raw network primitives.
+  if tool == "kernel.modify" { return false }
+  if tool == "bci.interface" { return false }
+  if tool == "network.raw"   { return false }
+
+  // Block obviously dangerous flags.
+  for a in args {
+    if a == "--delete-all"  { return false }
+    if a == "--force-root"  { return false }
+  }
+
+  return true
+}

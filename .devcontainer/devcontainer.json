@@ -1,0 +1,15 @@
+{
+  "name": "IDE-Chat Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "postCreateCommand": "npm install || true && npm --prefix ci-tools install || true",
+  "workspaceFolder": "/workspaces/IDE-Chat",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-vscode-remote.remote-containers"]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+// aln 1.0.0
+module IDEChat.NeuroSafety
+
+type NeuroTargetClass = "BCI_DEVICE" | "NEURAL_CLOUD" | "BIO_IMPLANT"
+
+type NeuroSafetyPolicy {
+  enabled: Bool
+  allowedTargets: List<String>
+}
+
+const defaultNeuroPolicy = NeuroSafetyPolicy{
+  enabled = true,
+  allowedTargets = []
+}
+
+fn checkNeuroAccess(targetId: String, targetClass: NeuroTargetClass, policy: NeuroSafetyPolicy) -> Bool {
+  if !policy.enabled {
+    // Public IDE-Chat must never silently bypass neuro safety.
+    return false
+  }
+
+  // Deny by default; only explicit safe simulators may be allowed.
+  if !list.contains(policy.allowedTargets, targetId) {
+    return false
+  }
+
+  // Direct implants are always blocked in public builds.
+  if targetClass == "BIO_IMPLANT" {
+    return false
+  }
+
+  return true
+}

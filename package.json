@@ -1,0 +1,10 @@
+{
+  "name": "idechat-ci-tools",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "npm --prefix ci-tools run test-aln",
+    "test-intent-bundle": "node --test tests/generate-intent-bundle.test.mjs"
+  }
+}

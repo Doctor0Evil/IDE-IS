@@ -1,0 +1,18 @@
+// aln 1.0.0
+// ALN skeleton: Codespaces-side environment gate
+module IDEChat.DID.PrGate
+
+type EnvVerifyRequest {
+  branch: String
+  commit: String
+  requiredChecks: List<String>
+}
+
+type EnvVerifyResult {
+  success: Bool
+  details: String
+}
+
+fn runEnvVerify(req: EnvVerifyRequest) -> EnvVerifyResult {
+  unreachable
+}

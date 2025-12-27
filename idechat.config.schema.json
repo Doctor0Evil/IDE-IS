@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IDE-Chat Configuration",
+  "type": "object",
+  "properties": {
+    "projectRoot": { "type": "string" },
+    "git": {
+      "type": "object",
+      "properties": {
+        "defaultBranch": { "type": "string" },
+        "protectMain": { "type": "boolean" }
+      },
+      "required": ["defaultBranch"]
+    },
+    "safety": {
+      "type": "object",
+      "properties": {
+        "allowNetwork": { "type": "boolean" },
+        "allowShell": { "type": "boolean" },
+        "allowBCI": { "type": "boolean" },
+        "restrictedPaths": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["allowNetwork", "allowShell", "allowBCI"]
+    }
+  },
+  "required": ["projectRoot", "git", "safety"]
+}

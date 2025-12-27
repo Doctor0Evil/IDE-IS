@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IDE-Chat Local Identity Keys",
+  "type": "object",
+  "properties": {
+    "keyReferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "provider": { "type": "string", "enum": ["os-keychain", "hsm", "pkcs11"] },
+          "slot": { "type": "string" }
+        },
+        "required": ["label", "provider"]
+      }
+    }
+  },
+  "required": ["keyReferences"],
+  "additionalProperties": false
+}

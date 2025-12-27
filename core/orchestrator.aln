@@ -1,0 +1,54 @@
+// aln 1.0.0
+module IDEChat.Orchestrator
+
+import IDEChat.Safety
+import IDEChat.Routing
+import IDEChat.Adapters.GitHubCLI
+import IDEChat.Adapters.LocalShell
+import IDEChat.NeuroSafety
+
+type ProjectConfig {
+  projectRoot: String
+  defaultBranch: String
+}
+
+type ToolInvocation {
+  tool: String
+  args: List<String>
+}
+
+fn loadConfig(path: String) -> ProjectConfig {
+  let raw = fs.readJson(path)
+  return ProjectConfig{
+    projectRoot = raw["projectRoot"],
+    defaultBranch = raw["git"]["defaultBranch"]
+  }
+}
+
+fn handleUserPrompt(prompt: String, cfg: ProjectConfig) -> List<ToolInvocation> {
+  // AI / agent decides mapping and calls this routing function.
+  return IDEChat.Routing.route(prompt, cfg)
+}
+
+fn executeTools(invocations: List<ToolInvocation>, cfg: ProjectConfig) -> List<String> {
+  let results: List<String> = []
+
+  for inv in invocations {
+    if !IDEChat.Safety.isToolAllowed(inv.tool, inv.args) {
+      results.append("Blocked tool: " + inv.tool)
+      continue
+    }
+
+    let out =
+      match inv.tool {
+        "github.clone"      => IDEChat.Adapters.GitHubCLI.clone(inv.args)
+        "github.createPR"   => IDEChat.Adapters.GitHubCLI.createPR(inv.args)
+        "shell.run"         => IDEChat.Adapters.LocalShell.run(inv.args, cfg.projectRoot)
+        _                   => "Unknown tool: " + inv.tool
+      }
+
+    results.append(out)
+  }
+
+  return results
+}

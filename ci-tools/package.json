@@ -1,0 +1,13 @@
+{
+  "name": "ci-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "ajv-cli": "^5.0.0"
+  },
+  "scripts": {
+    "test-aln": "node check-aln-structure.mjs",
+    "validate-config": "ajv validate -s ../idechat.config.schema.json -d ../idechat.config.example.json"
+  }
+}

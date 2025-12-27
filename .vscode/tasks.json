@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ALN Lint",
+      "type": "process",
+      "command": "npm",
+      "args": ["test"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Config Validate",
+      "type": "process",
+      "command": "npm",
+      "args": ["--prefix","ci-tools","run","validate-config"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Routing Check",
+      "type": "process",
+      "command": "node",
+      "args": ["tests/idechat-routing-consistency.mjs"],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

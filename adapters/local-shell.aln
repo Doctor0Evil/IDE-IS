@@ -1,0 +1,12 @@
+// aln 1.0.0
+module IDEChat.Adapters.LocalShell
+
+fn run(args: List<String>, cwd: String) -> String {
+  let code, out, err = sys.execInDir(args, cwd)
+
+  if code != 0 {
+    return "shell.run error: " + err
+  }
+
+  return out
+}

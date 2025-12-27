@@ -1,0 +1,86 @@
+// Device registration scenarios for DEVICE_CLASS_REGISTER
+// Each scenario should be ALLOWed and must assert OwnsDevice relation and DEVICE_REGISTERED audit entry.
+
+scenario "register_cybernetic_device" {
+  let user = User { id: "user-0001" }
+  let device = Device { id: "dev-cyber-0001", device_class: "CYBERNETIC", owner_user: "user-0001", jurisdiction: {"US-CO"}, compliance: {"HIPAA"} }
+
+  request REGISTER_DEVICE {
+    user: user
+    device: device
+  }
+
+  expect ALLOW
+  assert relation OwnsDevice(user.id, device.id)
+  assert audit.entry("DEVICE_REGISTERED", device.id).field("device_class") == "CYBERNETIC"
+}
+
+scenario "register_bci_device" {
+  let user = User { id: "user-0002" }
+  let device = Device { id: "dev-bci-0001", device_class: "BCI", owner_user: "user-0002", jurisdiction: {"EU"}, compliance: {"BCI_RIGHTS","GDPR"} }
+
+  request REGISTER_DEVICE {
+    user: user
+    device: device
+  }
+
+  expect ALLOW
+  assert relation OwnsDevice(user.id, device.id)
+  assert audit.entry("DEVICE_REGISTERED", device.id).field("device_class") == "BCI"
+}
+
+scenario "register_neuromorphic_device" {
+  let user = User { id: "user-0003" }
+  let device = Device { id: "dev-neuro-0001", device_class: "NEUROMORPHIC", owner_user: "user-0003", jurisdiction: {"US-FED"}, compliance: {"ISO27001"} }
+
+  request REGISTER_DEVICE {
+    user: user
+    device: device
+  }
+
+  expect ALLOW
+  assert relation OwnsDevice(user.id, device.id)
+  assert audit.entry("DEVICE_REGISTERED", device.id).field("device_class") == "NEUROMORPHIC"
+}
+
+scenario "register_isomorphic_device" {
+  let user = User { id: "user-0004" }
+  let device = Device { id: "dev-iso-0001", device_class: "ISOMORPHIC", owner_user: "user-0004", jurisdiction: {"FIVE_EYES_BASELINE"}, compliance: {"ISO27001"} }
+
+  request REGISTER_DEVICE {
+    user: user
+    device: device
+  }
+
+  expect ALLOW
+  assert relation OwnsDevice(user.id, device.id)
+  assert audit.entry("DEVICE_REGISTERED", device.id).field("device_class") == "ISOMORPHIC"
+}
+
+scenario "register_organic_device" {
+  let user = User { id: "user-0005" }
+  let device = Device { id: "dev-org-0001", device_class: "ORGANIC_COMPUTING", owner_user: "user-0005", jurisdiction: {"US-CO"}, compliance: {"BCI_RIGHTS"} }
+
+  request REGISTER_DEVICE {
+    user: user
+    device: device
+  }
+
+  expect ALLOW
+  assert relation OwnsDevice(user.id, device.id)
+  assert audit.entry("DEVICE_REGISTERED", device.id).field("device_class") == "ORGANIC_COMPUTING"
+}
+
+scenario "register_standard_device" {
+  let user = User { id: "user-0006" }
+  let device = Device { id: "dev-std-0001", device_class: "STANDARD", owner_user: "user-0006", jurisdiction: {"US-FED"}, compliance: {"ISO27001"} }
+
+  request REGISTER_DEVICE {
+    user: user
+    device: device
+  }
+
+  expect ALLOW
+  assert relation OwnsDevice(user.id, device.id)
+  assert audit.entry("DEVICE_REGISTERED", device.id).field("device_class") == "STANDARD"
+}

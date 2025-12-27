@@ -1,0 +1,25 @@
+{
+  "projectRoot": "<ABSOLUTE_PATH_TO_PROJECT>",
+  "git": {
+    "defaultBranch": "main",
+    "protectMain": true
+  },
+  "safety": {
+    "allowNetwork": false,
+    "allowShell": true,
+    "allowBCI": false,
+    "restrictedPaths": [
+      "/etc",
+      "/sys",
+      "/proc",
+      "<ADD_YOUR_SECRETS_DIR>"
+    ]
+  },
+  "projects": {
+    "<ABSOLUTE_PATH_TO_PROJECT>": {
+      "allowedTools": [],
+      "history": [],
+      "mcpContextUris": []
+    }
+  }
+}

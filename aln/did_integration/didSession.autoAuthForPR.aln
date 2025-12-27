@@ -1,0 +1,20 @@
+// aln 1.0.0
+// ALN skeleton: DID-backed PR delegation
+module IDEChat.DID.AutoAuth
+
+type PRDelegationRequest {
+  requesterDid: String
+  repo: String
+  branch: String
+  scope: List<String>
+  expiresAt: String
+}
+
+type PRDelegationResponse {
+  capabilityToken: String
+  expiresAt: String
+}
+
+fn requestPRDelegation(req: PRDelegationRequest) -> PRDelegationResponse {
+  unreachable
+}

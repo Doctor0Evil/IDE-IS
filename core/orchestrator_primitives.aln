@@ -1,0 +1,88 @@
+// aln 1.0.0
+module IDEChat.Primitives
+
+// High-level ALN primitives for IDE-Chat orchestration
+
+/*
+  Functions are specified at a high level to be implemented by backends
+  (containers, remote runners, package resolvers). They are intentionally
+  declarative and policy-aware; they accept structured inputs and return
+  structured outputs for auditability and reproducibility.
+*/
+
+type ToolchainSpec {
+  language: String
+  version: String
+  tools: List<String>
+}
+
+type DependencyDescriptor {
+  name: String
+  source: String
+  semver: String
+  license: String
+  integrityHash: String
+}
+
+type InstallPlan {
+  artifacts: List<String>
+  layout: String
+  integrity: String
+}
+
+type TaskResult {
+  success: Bool
+  logs: String
+  artifacts: List<String>
+}
+
+// 1. env.declarativeToolchain(manifest) -> ToolchainSpec
+fn declarativeToolchain(manifest: String) -> ToolchainSpec {
+  // Backend resolves the manifest into a concrete profile.
+  unreachable
+}
+
+// 2. pkg.unifiedResolve(deps) -> {lockedSet}
+fn unifiedResolve(deps: List<DependencyDescriptor>) -> String {
+  unreachable
+}
+
+// 3. pkg.reproducibleInstallPlan(lockedSet) -> InstallPlan
+fn reproducibleInstallPlan(lockedSet: String) -> InstallPlan {
+  unreachable
+}
+
+// 4. runtime.remoteTaskRunner(envProfile, taskSpec) -> TaskResult
+fn remoteTaskRunner(env: ToolchainSpec, taskSpec: String) -> TaskResult {
+  unreachable
+}
+
+// 5. workspace.immutableDevContainerProfile(profileSpec) -> String
+fn immutableDevContainerProfile(profileSpec: String) -> String {
+  unreachable
+}
+
+// 6. codegen.languageBridge(intent, lang) -> String
+fn languageBridge(intent: String, lang: String) -> String {
+  unreachable
+}
+
+// 7. ci.policyBoundPipeline(pipelineSpec) -> String
+fn policyBoundPipeline(pipelineSpec: String) -> String {
+  unreachable
+}
+
+// 8. artifact.secureBundle(artifacts, meta) -> String
+fn secureBundle(artifacts: List<String>, meta: String) -> String {
+  unreachable
+}
+
+// 9. audit.toolUsageLedger(event) -> Bool
+fn toolUsageLedger(event: String) -> Bool {
+  unreachable
+}
+
+// 10. orchestrator.dependencyFreeVerification(projectSpec) -> TaskResult
+fn dependencyFreeVerification(projectSpec: String) -> TaskResult {
+  unreachable
+}

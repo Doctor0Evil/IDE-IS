@@ -1,0 +1,9 @@
+# Local keys (must not be committed)
+identity/local-keys.json
+
+# Node modules / CI artifacts
+node_modules/
+ci-tools/node_modules/
+
+# Logs
+logs/

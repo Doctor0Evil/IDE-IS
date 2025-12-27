@@ -1,0 +1,78 @@
+// AI-CHAT CONNECTED IDE ORCHESTRATOR – CORE ALN LOGIC (ALL DEVICE CLASSES ENABLED)
+// Origin id_tag$: SAFE_ROOM.AI_IDE_ORCH.2025-12-22.US-CO.FED-CIV.ALN-JSF.[USER-SESSION].[file:11]
+
+aln.bundle Orchestrator_Core v1.1 {
+  authority "SAFE_ROOM_ORIGIN"
+  jurisdiction [ "US-FED", "US-CO", "EU-GDPR", "FIVE_EYES_BASELINE" ]
+  scope [ "AI_CHAT_IDE_ORCHESTRATION", "IP_PROTECTION", "SESSION_MANAGEMENT", "DEVICE_AUDIT" ][web:2][web:6]
+}
+
+/* Types and relations from v1.0 preserved here (User, Environment, Project, Session, Command, Artifact, ExportRequest, relations, and existing policies). */
+
+/* ============================
+ * 5. ETHICS & DEVICE AUDIT LAYER
+ * ============================ */
+
+// Federated learning remains prohibited for Safe Room usage.
+aln.policy FEDERATED_LEARNING_PROHIBIT {
+  when request.kind == "ENABLE_FEATURE"
+  let feature = request.feature_name
+
+  deny if feature == "FEDERATED_LEARNING" {
+    audit.append("FEATURE_DENY_FEDERATED_LEARNING", feature, {
+      "reason": "prohibited feature in Safe Room context"
+    })
+  }
+}
+
+/* 5.1 DEVICE_CLASS_REGISTER – accept and audit all device classes, including CYBERNETIC / BCI / NEUROMORPHIC / ISOMORPHIC / ORGANIC_COMPUTING. */
+
+aln.type Device {
+  field id           : string(regex="^[A-Za-z0-9._:-]{3,128}$")
+  field device_class : enum["CYBERNETIC","BCI","NEUROMORPHIC","ISOMORPHIC","ORGANIC_COMPUTING","STANDARD"]
+  field owner_user   : string
+  field jurisdiction : set<string>
+  field compliance   : set<string> // e.g., "HIPAA","GDPR","BCI_RIGHTS","ISO27001".[web:2][file:11]
+}
+
+aln.relation OwnsDevice(User.id, Device.id)
+
+aln.policy DEVICE_CLASS_REGISTER {
+  when request.kind == "REGISTER_DEVICE"
+  let u  = request.user as User
+  let dev= request.device as Device
+
+  // User and device identifiers must be non-empty and class must be recognized.
+  require u.id != ""
+  require dev.id != ""
+  require dev.device_class in ["CYBERNETIC","BCI","NEUROMORPHIC","ISOMORPHIC","ORGANIC_COMPUTING","STANDARD"]
+
+  // Bind device ownership and jurisdictional context.
+  effect ALLOW {
+    relation.add OwnsDevice(u.id, dev.id)
+
+    audit.append("DEVICE_REGISTERED", dev.id, {
+      "user": u.id,
+      "device_class": dev.device_class,
+      "jurisdiction": dev.jurisdiction,
+      "compliance": dev.compliance
+    })
+  }
+}
+
+/* Small DSU hardening: deny shell-chaining / redirection in DSU commands beyond existing RE_NO_SHELL_INJECTION. */
+
+aln.policy DSU_COMMAND_SANITIZE {
+  when request.kind == "DSU_COMMAND"
+  let cmd = request.command as string
+
+  // Deny obvious shell chaining and redirection operators that enable compound or redirected execution
+  // and deny common network/transfer utilities that could exfiltrate data when invoked directly.
+  deny if regex_match(cmd, ";|\&\&|\|\||\||>|<|`|\b(curl|wget|scp|nc|netcat|ftp)\b") {
+    audit.append("DSU_COMMAND_REJECTED_SHELL_OP", cmd, {
+      "reason": "prohibited shell operators or network transfer utilities in DSU command"
+    })
+  }
+}
+
+/* Existing JURISDICTIONAL_GUARD, SESSION_BIND, PROJECT_ACCESS, CODE_REPRO_BLOCK, IP_TAG_ENFORCE, EXPORT_CHECK, and API definitions remain as in v1.0, without any device-class denial logic. */
