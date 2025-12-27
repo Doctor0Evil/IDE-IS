@@ -1,0 +1,48 @@
+aln MANIFEST IDE_IS_CLEAN_V2
+  id              IDE_IS_CORE_CLEAN
+  owner           did:ion:EiD8J2b3K8k9Q8x9L7m2n4p1q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0
+  steward         Dr_Jacob_Scott_Farmer
+  version         2.0.0
+  runtime         ALN_QSAFE_2027_GAMING
+  target_platforms [
+    "UnrealEngine5",
+    "Unity2025",
+    "Godot4",
+    "AU_SmartCity_Nodes",
+    "NextGen_BCI_DevKits"
+  ]
+  
+  core_goals [
+    "Zero-latency AI-chat workflow orchestration for gaming pipelines",
+    "HTTP3-QUIC dev-tunnels for real-time multiplayer dev environments",
+    "PQC-secured cross-platform builds with 99.9% compliance",
+    "Observation-first execution with instant rollback for live gaming deploys",
+    "Energy-optimized for distributed AU lab clusters"
+  ]
+  
+  crypto_suite {
+    key_exchange  ML_KEM_1024
+    signature     SLH_DSA_SHA2_128f
+    tls_mode      TLS_1_3_QUIC_ONLY
+    session_keys  ephemeral_256bit
+  }
+  
+  safety_runtime {
+    hardware_bans [
+      "neuromorphic_direct_control",
+      "raw_bci_input",
+      "emotion_signal_processing"
+    ]
+    execution_mode observation_first
+    hitl_threshold 0.01_risk
+    max_autonomy   95_percent
+  }
+  
+  geospatial_nodes [
+    phoenix_az_us,
+    singapore_asia,
+    rotterdam_eu,
+    los_angeles_ca,
+    munich_de
+  ]
+ALNEND
