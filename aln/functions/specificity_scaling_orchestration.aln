@@ -1,0 +1,9 @@
+# SpecificityScaling – Orchestration Functions for SDN/TSN/QPQ Smart-City Fabric
+# Trust-aware privilege scaling for neuromorphic vNodes, gaming edges, and AU research nets.[web:1]
+
+destination-path,function-name,input-params,output-type,protocol-stack,security-enforce,ai-collaborators,compliance-check,action-sequence,rollback-policy,error-handling
+/aln/specs/scaling,SPECSCALE_CalculateTrust,karma:uint32_contribs:uint16_flag:bool_compliance_sig:hex64,uint16-specificity,TSN-SDN-QUIC,PQC-MLKEM-Enforce,Mistral-Qwen-Claude,Score>=0.99,base_scale_0x1000:modifier_calc:if_compliance_and_MAX_0x7FFF_else_half_and_0x1A9F:log-immutable,snapshot-restore,auth-verify-fail-block
+/aln/specs/auth,SPECSCALE_VerifyAuth,hashsig:hex64_dataset:str,bool-valid,WebSockets-TLS,FIDO2-Credential,Qwen-Grok-Perplexity,Jurisdiction-Tag-Verify,checksum_dataset_eq_hashsig_slice:dispatch_sandbox:audit-chain,auto-quarantine,regex-sanitize-injection
+/aln/specs/apply,SPECSCALE_ApplyElevation,user:str_trust:metrics,void-dispatch,HTTP3-ZTNA,Immutable-ChainLog,Claude-Sonar-Mistral,ALN-BannedTech-Filter,calculate_specificity:verify_authorship:apply_scaling:report-session,ephemeral-destroy,anomaly-emergency-lock
+/aln/specs/gaming,SPECSCALE_LowLatency,user_trust:metrics,stream-priority,TSN-Qbv-Shaper,QuantumGrade-PQC,Grok-Qwen,LowJitter-Guarantee,timeaware_gate:credit_shaper:guardband_protect:real-time-stream,rollback-branch,health-check-detect
+/aln/specs/iot,SPECSCALE_IoTOrchestrate,trust_metrics:dataset,session-token,SDN-DynamicPolicy,ZeroTrust-Segment,Perplexity-Claude,Weighted-Sum-Controls,manifest_load:privilege_elevate:agentic_route:compliance_score,restore-state,dependency-scan-block
