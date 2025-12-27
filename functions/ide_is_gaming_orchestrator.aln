@@ -1,0 +1,22 @@
+aln ORCHESTRATOR IDE_IS_GAMING_V2
+  runtime         ALN_GAMING_2027
+  description     "Clean production ALN for gaming IDE-IS orchestration"
+  
+  function_table <<CSV
+path,name,params,output,stack,security,ai_agents,compliance,sequence,rollback,error_mode
+/gaming/core,GameOrchestrate,repo:manifest:sdk,build_pipeline,QUIC_SDN,pqc_enforce,MistralQwenUnity,Score_0.999,load_validate_build_test_deploy,snapshot_restore,sanitize_fail
+/gaming/multiplayer,MultiplayerTunnel,players:map:region,tunnel_session,WebSocket_PQC,ZTA_FIDO2,GrokClaudeGodot,JurisdictionVerify,spawn_tunnel_sync_test_rollback,branch_protect,regex_block
+/gaming/unreal,UnrealBlueprintFlow,blueprint_json:scene,tunnel_workspace,MQTT_Event,FIDO2_Age,MistralUnity,ALNBannedFilter,import_blueprint_compile_test_pr,destroy_ephemeral,allowlist_exec
+/gaming/au_lab,AULabCompliance,lab_data:reg_map,score_float,SDN_ZeroTrust,DID_Verify,PerplexitySonar,WeightedControls,compute_compliance_block_log,terminate_fail,device_filter
+/gaming/unity,UnityDOTSBuild,assembly:scenes:platform,build_artifact,HTTP3_RealTime,PQC_MLKEM,QwenGrok,RoleVerify,read_assemble_test_commit,protect_branch,readonly_mode
+/gaming/ci_fix,AutoGameCIFix,failure_log:pr_state,fix_branch,QUIC_Actions,ChainLog,ClaudeSonar,AutoTerminate,parse_propose_test_retry,restore_state,emergency_lock
+/gaming/discovery,GameToolSearch,query:tags:platform,index_json,Regex_Engine,CryptoAnchor,GrokPerplexity,ConfidenceTag,crawl_tag_query_tools,telemetry_sync,health_check
+CSV
+  
+  gaming_constraints {
+    max_players_per_tunnel 128
+    blueprint_size_limit   256MB
+    realtime_target        60fps
+    rollback_latency_max   50ms
+  }
+ALNEND
