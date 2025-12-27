@@ -1,0 +1,29 @@
+aln MODULE ALN_PURE_STACK_GUARD_V3
+  description "Ensures ALN execution remains free from contaminated dependencies and non-native stacks."
+  runtime     ALN_QSAFE_2027
+
+  forbidden_artifacts [
+    dynamic_link_library,
+    shared_object,
+    foreign_runtime_vm,
+    embedded_script_engine,
+    unsafe_jit
+  ]
+
+  function ALN_StackPreflight(env_state)
+    step 1  scan_loaded_modules      env_state
+    step 2  compare_with_forbidden   forbidden_artifacts
+    step 3  if any_forbidden then
+              mark_env tainted
+              deny_execution
+            end
+    step 4  mark_env clean
+    step 5  allow_execution
+  END
+
+  function ALN_StackAttestation(env_state)
+    step 1  compute_hash_state        env_state
+    step 2  store_hash_in_audit_log   env_state
+    step 3  return_attestation_token  env_state
+  END
+ALNEND
