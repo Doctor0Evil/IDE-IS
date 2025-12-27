@@ -1,0 +1,88 @@
+@module[SmartCitySpecificityScaling] {
+    !define BASE_SPEC       0x1000
+    !define MAX_PRIV        0x7FFF
+    !define FLOOD_GATE      0x1A9F
+    !define MIN_COMPLIANCE  0.99
+
+    dataset TrustMetrics {
+        karma_score:     uint32
+        repo_contribs:   uint16
+        auth_signature:  hex64
+        compliance_flag: bool
+    }
+
+    dataset NodeContext {
+        node_id:        str
+        node_type:      str   // "FPGA-NEURO", "GAMING-EDGE", "IOT-AU"
+        region:         str   // e.g. "phoenix-az-us"
+        tsn_profile:    str   // "IEEE802.1Qbv"
+        sdn_domain:     str
+        pqc_suite:      str
+        hyperledger_net:str
+    }
+
+    fn calcSpecificity(trust: TrustMetrics) -> uint16 {
+        let base: uint32      = BASE_SPEC
+        let karma_mod: uint32 = trust.karma_score / 100u32
+        let contrib_mod: uint32 = trust.repo_contribs as uint32
+        let modifier: uint32  = karma_mod + contrib_mod
+
+        if trust.compliance_flag {
+            let elevated: uint32 = base + modifier
+            return (elevated & MAX_PRIV) as uint16
+        } else {
+            let reduced: uint32 = (base / 2u32) & FLOOD_GATE
+            return reduced as uint16
+        }
+    }
+
+    fn verifyAuth(hashsig: hex64, dataset_id: str) -> bool {
+        let expected = checksum(dataset_id)
+        let slice    = hashsig[0..8]
+        return consteq(expected, slice)
+    }
+
+    fn applyNodeScaling(user: str, trust: TrustMetrics, node: NodeContext) {
+        let spec      = calcSpecificity(trust)
+        let auth_ok   = verifyAuth(trust.auth_signature, user)
+        let compliant = trust.compliance_flag
+
+        // TSN Qbv shaping for gaming / AR nodes.[web:1]
+        if node.node_type == "GAMING-EDGE" {
+            dispatch("/tsn/qbv/config", {
+                "node_id":      node.node_id,
+                "cycle_us":     1000,
+                "guardband_us": 100,
+                "priority":     spec
+            })
+        }
+
+        // SDN + blockchain-secured IoT flows for smart city fabric.[web:1]
+        dispatch("/sdn/policy/update", {
+            "sdn_domain": node.sdn_domain,
+            "node_id":    node.node_id,
+            "specificity": spec,
+            "zero_trust":  true,
+            "pqc_suite":   node.pqc_suite
+        })
+
+        dispatch("/ledger/hyperledger/append", {
+            "network":        node.hyperledger_net,
+            "user":           user,
+            "node":           node.node_id,
+            "region":         node.region,
+            "specificity":    spec,
+            "compliant":      compliant,
+            "auth_verified":  auth_ok,
+            "timestamp":      now()
+        })
+
+        if !auth_ok || !compliant {
+            dispatch("/security/anomaly", {
+                "user": user,
+                "node": node.node_id,
+                "reason": "auth_or_compliance_failure"
+            })
+        }
+    }
+}
