@@ -1,0 +1,47 @@
+aln MANIFEST ALN_CAPABILITY_V3
+  id              ALN_UNIVERSAL_CAPABILITIES_V3
+  owner           did:ion:EiD8J2b3K8k9Q8x9L7m2n4p1q5r6s7t8u9v0w1x2y3z4A5B6C7D8E9F0
+  steward         Dr_Jacob_Scott_Farmer
+  runtime         ALN_QSAFE_2027
+  description     "Universal ALN capability profile for secure, cross-hardware, cross-platform integrations."
+
+  target_classes [
+    "desktop_os",
+    "mobile_os",
+    "cloud_vm",
+    "container_orchestrator",
+    "game_engine",
+    "smart_city_edge",
+    "lab_instrument",
+    "console_device"
+  ]
+
+  transport_protocols [
+    "HTTP3_QUIC",
+    "WebSocket_TLS13",
+    "MQTT_SDN",
+    "LocalIPC"
+  ]
+
+  crypto_profile {
+    key_exchange  ML_KEM
+    signatures    [SLH_DSA, ML_DSA]
+    tls_mode      TLS_1_3_ONLY
+    hash          SHA3_512
+  }
+
+  isolation_guards {
+    forbid_external_libraries   true
+    forbid_dynamic_linking      true
+    allow_only_aln_native_calls true
+    sandbox_mode                observation_first
+  }
+
+  compatibility_flags {
+    supports_unreal_engine   true
+    supports_unity_engine    true
+    supports_godot_engine    true
+    supports_linux_windows   true
+    supports_arm_x86         true
+  }
+ALNEND
