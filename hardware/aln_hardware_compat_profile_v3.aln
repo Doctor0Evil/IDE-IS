@@ -1,0 +1,30 @@
+aln MODULE ALN_HARDWARE_COMPAT_PROFILE_V3
+  description "Hardware abstraction profile proving ALN compatibility with diverse, secure device classes."
+  runtime     ALN_QSAFE_2027
+
+  device_matrix <<CSV
+device_class,arch,os_family,exec_mode,support_level,safe_flags
+desktop,amd64,desktop_os,userland,full,sandbox_required
+laptop,amd64,desktop_os,userland,full,sandbox_required
+mobile,arm64,mobile_os,userland,partial,restricted_io
+console,custom,console_os,userland,full,no_kernel_hooks
+edge_node,arm64,linux,userland,full,zero_trust
+cloud_vm,amd64,cloud_os,userland,full,immutable_logs
+container,kernel_independent,linux_namespace,userland,full,readonly_root
+lab_instrument,mixed,rtos,userland,partial,read_only_bus
+CSV
+
+  restrictions {
+    forbid_kernel_modules     true
+    forbid_firmware_writes    true
+    forbid_direct_bci_access  true
+    forbid_neuromorphic_io    true
+  }
+
+  function ALN_CheckHardwareSupport(device_descriptor)
+    step 1  lookup_row_in_matrix device_descriptor
+    step 2  verify_safe_flags    device_descriptor
+    step 3  if unsupported then return denied
+    step 4  else return allowed
+  END
+ALNEND
