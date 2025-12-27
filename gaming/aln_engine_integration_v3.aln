@@ -1,0 +1,41 @@
+aln MODULE ALN_ENGINE_INTEGRATION_V3
+  description "ALN integration profile for Unreal, Unity, and Godot without importing external libraries."
+  runtime     ALN_QSAFE_2027_GAMING
+
+  engines [
+    UnrealEngine,
+    UnityEngine,
+    GodotEngine
+  ]
+
+  function ALN_Unreal_Toolcall(context)
+    step 1  receive_blueprint_metadata  context
+    step 2  sanitize_graph              context
+    step 3  compute_metrics             context
+    step 4  emit_suggestions            context
+    step 5  write_unreal_audit_event    context
+  END
+
+  function ALN_Unity_Toolcall(context)
+    step 1  inspect_dots_systems        context
+    step 2  check_data_layout           context
+    step 3  optimize_job_schedule       context
+    step 4  generate_safe_patch_plan    context
+    step 5  emit_unity_report           context
+  END
+
+  function ALN_Godot_Toolcall(context)
+    step 1  analyze_scene_tree          context
+    step 2  check_signals_and_scripts   context
+    step 3  compute_performance_budget  context
+    step 4  suggest_node_rewrites       context
+    step 5  log_godot_diag              context
+  END
+
+  protection {
+    allow_read_project_state true
+    allow_write_code         false
+    allow_write_patch_files  true
+    patch_files_suffix       ".aln.patch"
+  }
+ALNEND
