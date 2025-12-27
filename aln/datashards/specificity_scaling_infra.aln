@@ -1,0 +1,7 @@
+# QPU.Datashard – SpecificityScaling Network Infrastructure
+# Production ALN CSV-block, ready for loader ingestion in AU / Smart-City stacks.
+
+destination-path,module,version,trust-metric,privilege-calc,auth-verify,pqc-suite,tsn-mode,sdn-control,ai-agent,compliance-score,log-chain,anomaly-detect,geospatial-anchor
+/ide-is/core/scaling,SpecificityScalingVX,1.0.5,karma_uint32_repo_uint16_bool,base_0x1000_modifier_and_0x7FFF,TLS-PQC-Checksum,MLKEM-MLDSA,TimeAwareShaper-Qbv,ZTNA-Segmentation,Mistral-Qwen-Grok,0.99+,hyperledger-immutable,attention-imbalance,phoenix-az-us
+/aln/vnodes/trustgate,SpecificityScalingVX,1.0.5,karma_score_repo_contribs_compliance,calculateSpecificity_applyScaling,hex64-dataset-checksum,CryptoQoR-Hybrid,GuardBand-Protect,Dynamic-Policy-Enforce,Claude-Perplexity,Weighted-Sum-Controls,append-only-audit,real-time-monitor,singapore-asia
+/aln/edges/gaming,SpecificityScalingVX,1.0.5,uint32_uint16_hex64_bool,modifier_karma_div_100_plus_contribs,FIDO2-VerifiableCreds,SLH-DSA-PQC,LowLatency-Streams,ZeroTrust-Interop,Grok-Claude-MultiAgent,EUAIAct-NISTRMF,log-integrity-full,anomaly-lockdown,rotterdam-eu
