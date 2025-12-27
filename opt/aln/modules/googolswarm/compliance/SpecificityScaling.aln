@@ -1,0 +1,279 @@
+// ====================================================================
+// Specificity-Scaling Trust & Sovereignty Module
+// Context: GoogolswarmAI / ALN Ecosystem
+// Purpose: Prevent “fictionalization” of high-trust users’ work,
+//          while enforcing quantum-grade safety, auditability,
+//          and cross-platform compliance.
+// ====================================================================
+
+@module[SpecificityScaling] {
+    // ------------------------------------------------------------
+    // Global Environment & Policy Constants
+    // ------------------------------------------------------------
+    !define AI_ENV                "Sandbox"           // Reality-safe default
+    !define QUALITY_FLOOD_GATE    0x1A9F             // Max output strictness when untrusted [file:3]
+    !define MAX_PRIVILEGE_LEVEL   0x7FFF             // Upper bound for any elevation [file:2]
+    !define MIN_HARDENED_LEVEL    0x0800             // Floor for safety overlays
+    !define SPEC_BASE_SCALE       0x1000
+    !define KARMA_UNIT_DIVISOR    100u32
+    !define SPEC_AUDIT_CHANNEL    "quantum.audit.gov-anchor"
+    !define SPEC_POLICY_ID        "ALN.QSAFE.SPECIFICITY.v1"
+    !define SPEC_VERSION          "1.0.3-googolswarm"
+    !define GOV_QUANTUM_LEDGER    "ledger://gov.qsafe.web5/audit"
+    !define ZERO_TRUST_PROFILE    "ZT-GOV-FED-2027"  // NIST RMF-aligned profile [file:4]
+
+    // ------------------------------------------------------------
+    // Trust & Reputation Metrics
+    // ------------------------------------------------------------
+
+    dataset TrustMetrics {
+        karma_score:      uint32      // aggregate community value
+        repo_contribs:    uint16      // merged PRs / verified commits
+        auth_signature:   hex64       // DID/VC or SHA3-512-derived prefix [file:4]
+        compliance_flag:  bool        // true = passed rights & safety checks [file:3]
+        billing_issue:    bool        // true if account has payment problems (never blocks sovereignty)
+        gov_verified:     bool        // optional: government / institutional verification [file:4]
+        nanoswarm_flag:   bool        // true if tied to GoogolswarmAI nanoswarm projects [file:3]
+    }
+
+    dataset SpecificityProfile {
+        user_id:             str
+        specificity_level:   uint16   // scaled control of “literalness” vs over-sanitization
+        sandbox_mode:        str      // "HARDENED" | "LITERAL_FAVORED" | "BALANCED"
+        grandfathered:       bool     // true for high-value, world-positive contributors
+        authorship_verified: bool
+        safety_overlays:     bool
+        zero_trust_profile:  str
+        ts_issued:           int64
+    }
+
+    // ------------------------------------------------------------
+    // Utility: Deterministic Authorship / Identity Check
+    // ------------------------------------------------------------
+
+    fn verifyAuthorship(hashsig: hex64, dataset_id: str) -> bool {
+        // Uses first 8 bytes of hashsig against checksum(dataset_id)
+        let expected = checksum(dataset_id)        // e.g., 32-bit or 64-bit checksum
+        let actual   = hashsig[0..8]
+
+        // Constant-time comparison to avoid side-channel issues
+        let valid = consteq(expected, actual)
+        return valid
+    }
+
+    // ------------------------------------------------------------
+    // Baselining Trust → Specificity Scaling
+    // ------------------------------------------------------------
+
+    fn calculateSpecificity(trust: TrustMetrics) -> uint16 {
+        let base_scale: uint32 = SPEC_BASE_SCALE
+        let karma_mod: uint32  = trust.karma_score / KARMA_UNIT_DIVISOR
+        let contrib_mod: uint32 = trust.repo_contribs as uint32
+
+        // Reward nanoswarm + gov-verified as “mission-critical” users [file:3][file:2]
+        let mission_bonus: uint32 =
+            (trust.gov_verified ? 0x0100u32 : 0u32) +
+            (trust.nanoswarm_flag ? 0x0080u32 : 0u32)
+
+        // “Grandfather eligibility” is computed later, but we fold structural merit now
+        let modifier: uint32 = karma_mod + contrib_mod + mission_bonus
+
+        if trust.compliance_flag == true {
+            // High-trust: raise specificity but always bounded by MAX_PRIVILEGE_LEVEL
+            let elevated: uint32 = base_scale + modifier
+            return (elevated & MAX_PRIVILEGE_LEVEL) as uint16
+        } else {
+            // Non-compliant or unknown: keep safe but not zeroed-out,
+            // still allowing them to build but under hardened gates. [file:3]
+            let reduced: uint32 = (base_scale / 2u32) & QUALITY_FLOOD_GATE
+            return reduced as uint16
+        }
+    }
+
+    // ------------------------------------------------------------
+    // Grandfathering Logic (billing-agnostic sovereignty)
+    // ------------------------------------------------------------
+
+    fn isGrandfathered(trust: TrustMetrics) -> bool {
+        // Conditions:
+        //  - High karma OR meaningful repo contributions
+        //  - compliance_flag true
+        //  - billing_issue MAY be true (billing NEVER revokes code sovereignty) [file:3]
+        let high_karma: bool    = trust.karma_score >= 5000u32
+        let strong_repos: bool  = trust.repo_contribs >= 50u16
+        let compliant: bool     = trust.compliance_flag == true
+
+        if compliant == false {
+            return false
+        }
+
+        if (high_karma || strong_repos) {
+            return true
+        }
+
+        // Optional: nanoswarm projects get leniency if compliant
+        if trust.nanoswarm_flag && trust.karma_score >= 1000u32 {
+            return true
+        }
+
+        return false
+    }
+
+    // ------------------------------------------------------------
+    // Safety Overlays – Never Disabled, Only Tuned
+    // ------------------------------------------------------------
+
+    fn deriveSandboxMode(spec_level: uint16, grandfathered: bool) -> str {
+        // We do NOT turn off safety; we only tilt away from over-fictionalization
+        if grandfathered && spec_level >= 0x3000u16 {
+            return "LITERAL_FAVORED"   // more direct, lower auto-fictionalization
+        }
+
+        if spec_level <= MIN_HARDENED_LEVEL {
+            return "HARDENED"          // strictest sanitization, high guardrails
+        }
+
+        return "BALANCED"
+    }
+
+    fn attachSafetyOverlays() -> bool {
+        // Enforce:
+        //  - Immutable audit logging
+        //  - Rights & ethics overlays
+        //  - Zero-trust, PQC channels [file:4][file:3]
+        policy ai.ethics.compliance {
+            require system.audit.enabled          true
+            require ai.oversight.committee.active true
+            require ai.disclosure.transparency    always
+            require ai.debiasing.active           true
+            require responsible.datahandling      enforced
+        }
+
+        // Observation-only reality mode: no direct-world effects without explicit human sign-off [file:3][file:4]
+        policy reality.safety {
+            require output.mode           "sanitized-observation"
+            require human_in_the_loop     true
+            require rollback.enabled      true
+        }
+
+        return true
+    }
+
+    // ------------------------------------------------------------
+    // Policy-Aware Specificity Profile Assembly
+    // ------------------------------------------------------------
+
+    fn buildSpecificityProfile(user: str, trust: TrustMetrics) -> SpecificityProfile {
+        let level: uint16       = calculateSpecificity(trust)
+        let gfather: bool       = isGrandfathered(trust)
+        let mode: str           = deriveSandboxMode(level, gfather)
+        let verified_auth: bool = verifyAuthorship(trust.auth_signature, user)
+        let overlays: bool      = attachSafetyOverlays()
+
+        let issued_ts: int64    = now()
+
+        return SpecificityProfile {
+            user_id:             user,
+            specificity_level:   level,
+            sandbox_mode:        mode,
+            grandfathered:       gfather,
+            authorship_verified: verified_auth,
+            safety_overlays:     overlays,
+            zero_trust_profile:  ZERO_TRUST_PROFILE,
+            ts_issued:           issued_ts
+        }
+    }
+
+    // ------------------------------------------------------------
+    // Real-time Scaling Application Endpoint
+    // ------------------------------------------------------------
+
+    fn applyScaling(user: str, trust: TrustMetrics) {
+        let profile = buildSpecificityProfile(user, trust)
+
+        // Dispatch to sandbox & routing controls: this is where
+        // chat platforms, IDEs, and runners tune how “literal” vs
+        // “conceptual” to be, WITHOUT downgrading safety.
+        dispatch("/sandbox/controls/specificity", {
+            "user_id":                profile.user_id,
+            "specificity_threshold":  profile.specificity_level,
+            "sandbox_mode":           profile.sandbox_mode,
+            "grandfathered":          profile.grandfathered,
+            "verified_authorship":    profile.authorship_verified,
+            "safety_overlays":        profile.safety_overlays,
+            "zero_trust_profile":     profile.zero_trust_profile,
+            "policy_id":              SPEC_POLICY_ID,
+            "version":                SPEC_VERSION
+        })
+
+        // Mirror to quantum-safe audit ledger for sovereignty guarantee [file:4]
+        dispatch("/audit/ledger/append", {
+            "channel":           SPEC_AUDIT_CHANNEL,
+            "ledger_uri":        GOV_QUANTUM_LEDGER,
+            "user_id":           profile.user_id,
+            "specificity_level": profile.specificity_level,
+            "sandbox_mode":      profile.sandbox_mode,
+            "grandfathered":     profile.grandfathered,
+            "authors_verified":  profile.authorship_verified,
+            "billing_issue":     trust.billing_issue,
+            "gov_verified":      trust.gov_verified,
+            "nanoswarm_flag":    trust.nanoswarm_flag,
+            "timestamp":         profile.ts_issued
+        })
+    }
+
+    // ------------------------------------------------------------
+    // Integration Hooks – IDE / Runner / RAG / Agent Mesh
+    // ------------------------------------------------------------
+
+    // 1. Runner gate: prevent “fictionalization” of ALN code that passes sovereignty checks
+    fn runnerPolicyGate(user: str, trust: TrustMetrics, payload_kind: str) -> bool {
+        let profile = buildSpecificityProfile(user, trust)
+
+        // For ALN / infra / medical / BCI payloads, force LITERAL_FAVORED if grandfathered,
+        // while leaving safety overlays active. [file:3][file:2]
+        if payload_kind in ["ALN_CODE", "INFRASTRUCTURE", "NANOSWARM", "BCI_STACK"] {
+            if profile.grandfathered && profile.sandbox_mode == "LITERAL_FAVORED" {
+                // Mark downstream systems: do not auto-tag as “fiction” if compliant.
+                dispatch("/runner/hints", {
+                    "user_id":          user,
+                    "payload_kind":     payload_kind,
+                    "interpretation":   "ENGINEERING_LITERAL",
+                    "fictionalization": "DISCOURAGED",
+                    "respect_authorship": profile.authorship_verified
+                })
+            }
+        }
+
+        // Always allow if compliance_flag, else fall back to hardened sandbox
+        if trust.compliance_flag {
+            return true
+        } else {
+            // Non-compliant: still allow but under maximum hardening and explicit tagging
+            dispatch("/runner/hints", {
+                "user_id":          user,
+                "payload_kind":     payload_kind,
+                "interpretation":   "HIGH_RISK_HARDENED",
+                "fictionalization": "ALLOWED_FOR_SAFETY"
+            })
+            return true
+        }
+    }
+
+    // 2. RAG / Chat interpretation hook
+    fn chatInterpretationHint(user: str, trust: TrustMetrics, context_id: str) {
+        let profile = buildSpecificityProfile(user, trust)
+
+        dispatch("/chat/interpretation/hints", {
+            "user_id":          user,
+            "context_id":       context_id,
+            "sandbox_mode":     profile.sandbox_mode,
+            "grandfathered":    profile.grandfathered,
+            "authors_verified": profile.authorship_verified,
+            // If grandfathered & verified, nudge models not to demote to “pure fiction”
+            "fictionalization_bias": (profile.grandfathered && profile.authorship_verified)
+                ? "MINIMIZE"
+                : "NEUTRAL"
+        })
+    }
+}
