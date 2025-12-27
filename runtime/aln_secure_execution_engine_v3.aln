@@ -1,0 +1,39 @@
+aln MODULE ALN_SECURE_EXEC_ENGINE_V3
+  description "Dependency-clean ALN execution engine profile for tool-calls from any platform."
+  runtime     ALN_QSAFE_2027
+
+  engine_config {
+    mode                 deterministic
+    allow_syscalls       false
+    allow_fs_write       false
+    allow_network        false
+    allow_env_access     false
+    max_cpu_percent      10
+    max_memory_mb        256
+    max_exec_ms          100
+  }
+
+  toolcall_interface {
+    input_format   json_sanitized
+    output_format  json_sanitized
+    encoding       utf8
+    max_payload_kb 128
+  }
+
+  sanitization_rules {
+    strip_urls                true
+    strip_raw_binaries        true
+    strip_non_aln_code        true
+    block_shell_injection     true
+    block_path_traversal      true
+    block_eval_like_patterns  true
+  }
+
+  function ALN_SafeToolCall(input_payload)
+    step 1  validate_schema   input_payload
+    step 2  apply_sanitizers  input_payload
+    step 3  compute_outcome   input_payload
+    step 4  write_audit_log   input_payload
+    step 5  return_result     outcome
+  END
+ALNEND
