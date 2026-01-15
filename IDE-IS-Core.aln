@@ -1,0 +1,73 @@
+aln policy IDE-IS-Core
+Type declarations
+type IDEISProjectManifest
+id            string
+name          string
+repos         list[string]
+jurisdictions list[string]   # e.g., ["US","EU","JP"]
+actions       list[string]   # e.g., ["READ","PATCH","TEST","COMMIT","DEV_TUNNEL"]
+checksum      string
+type IDEISSessionToken
+userid        string
+deviceid      string
+sessionid     string
+manifest_id   string
+aisidecar     bool
+issued_at     timestamp
+expires_at    timestamp
+Trusted imports anchored by SystemRegex / virtanetv1
+trustedimports stdsecurity, stdquantum, sysneurodefense, systemregex, virtanetv1
+Manifest integrity
+function verify_manifest_integrity m IDEISProjectManifest bool
+let calculated = checksumconcat(m.id, m.name, join(m.repos), join(m.jurisdictions), join(m.actions))
+if m.checksum != calculated
+logsecurityevent "manifest_checksum_mismatch", m.id, now()
+return false
+return true
+Session validation with ALN-style sovereignty
+function validate_session_token tok IDEISSessionToken, m IDEISProjectManifest void
+require tok.aisidecar == true
+if !verify_manifest_integrity(m)
+abort "Non-compliant manifest"
+if !zerotrust_device_ok(tok.userid, tok.deviceid)
+securitylockdown "device_mismatch", tok.userid, tok.sessionid
+if now() > tok.expires_at
+securitylockdown "session_expired", tok.userid, tok.sessionid
+auditlog "session_validated", tok.userid, tok.sessionid, m.id, now()
+Action-level compliance check (per jurisdiction)
+function check_action_compliance m IDEISProjectManifest, action string bool
+let baseScore = compute_base_compliance(m.jurisdictions, action)
+if baseScore < 0.99
+logcompliance "action_blocked", m.id, action, baseScore, now()
+return false
+return true
+Core orchestration entry
+export function handle_chat_request tok IDEISSessionToken, m IDEISProjectManifest, action string, payload string string
+validate_session_token(tok, m)
+if !check_action_compliance(m, action)
+return "Action blocked by IDE-IS compliance engine"
+let result = execute_action(action, payload, m, tok)
+logaction "chat_request_handled", tok.userid, action, result.status, now()
+return result.output
+Build-steps integration
+function establish_plugin_core m IDEISProjectManifest void
+load_manifests "ideis-manifests/"
+compute_checksums_all()
+expose_readonly_api "list-manifests"
+Standardize orchestration protocol
+function plan_approve_apply_verify cycle PlanApproveCycle string
+plan = generate_plan(cycle.input)
+approval = get_approval(plan, cycle.user_role)
+if !approval
+return "Plan rejected"
+apply_result = apply_patch(plan, cycle.allow_list)
+verify_result = run_tests(plan.tests)
+commit_if_ok verify_result, "Auto-commit from cycle " + cycle.id
+return verify_result.summary
+GitHub integration
+function open_dev_tunnel m IDEISProjectManifest, session_tok IDEISSessionToken string
+clone_repos m.repos
+mount_workspace m.name
+resolve_constraints m.jurisdictions
+return session_handle(session_tok.sessionid, m.id)
+}
